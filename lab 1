@@ -1,0 +1,298 @@
+-- =====================================================
+-- LAB–1 : SQL CONCEPTS
+-- PART – A
+-- =====================================================
+
+-- 1. Retrieve all unique departments from the STUDENT table
+CREATE OR ALTER PROCEDURE SP_UNIQUE_STUDENT_DEPARTMENTS
+AS
+BEGIN
+    SELECT DISTINCT StuDepartment
+    FROM STUDENT;
+END;
+EXEC SP_UNIQUE_STUDENT_DEPARTMENTS;
+GO
+
+-- 2. Insert a new student record into the STUDENT table
+CREATE OR ALTER PROCEDURE SP_INSERT_NEW_STUDENT
+AS
+BEGIN
+    INSERT INTO STUDENT
+    VALUES (9,'Neha Singh','neha.singh@univ.edu','9876543218','IT','2003-09-20',2021);
+END;
+EXEC SP_INSERT_NEW_STUDENT;
+GO
+
+-- 3. Change the Email of student 'Raj Patel'
+CREATE OR ALTER PROCEDURE SP_UPDATE_RAJ_EMAIL
+AS
+BEGIN
+    UPDATE STUDENT
+    SET StuEmail = 'raj.p@univ.edu'
+    WHERE StuName = 'Raj Patel';
+END;
+EXEC SP_UPDATE_RAJ_EMAIL;
+GO
+
+-- 4. Add a new column 'CGPA' to the STUDENT table
+CREATE OR ALTER PROCEDURE SP_ADD_CGPA_COLUMN
+AS
+BEGIN
+    ALTER TABLE STUDENT
+    ADD CGPA DECIMAL(3,2);
+END;
+EXEC SP_ADD_CGPA_COLUMN;
+GO
+
+-- 5. Retrieve all courses whose CourseName starts with 'Data'
+CREATE OR ALTER PROCEDURE SP_COURSE_STARTS_WITH_DATA
+AS
+BEGIN
+    SELECT *
+    FROM COURSE
+    WHERE CourseName LIKE 'Data%';
+END;
+EXEC SP_COURSE_STARTS_WITH_DATA;
+GO
+
+-- 6. Retrieve all students whose Name contains 'Shah'
+CREATE OR ALTER PROCEDURE SP_STUDENT_NAME_SHAH
+AS
+BEGIN
+    SELECT *
+    FROM STUDENT
+    WHERE StuName LIKE '%Shah%';
+END;
+EXEC SP_STUDENT_NAME_SHAH;
+GO
+
+-- 7. Display all Faculty Names in UPPERCASE
+CREATE OR ALTER PROCEDURE SP_FACULTY_UPPERCASE
+AS
+BEGIN
+    SELECT UPPER(FacultyName) AS FacultyName
+    FROM FACULTY;
+END;
+EXEC SP_FACULTY_UPPERCASE;
+GO
+
+-- 8. Find all faculty who joined after 2015
+CREATE OR ALTER PROCEDURE SP_FACULTY_AFTER_2015
+AS
+BEGIN
+    SELECT *
+    FROM FACULTY
+    WHERE YEAR(FacultyJoiningDate) > 2015;
+END;
+EXEC SP_FACULTY_AFTER_2015;
+GO
+
+-- 9. Find the square root of credits for 'Database Management Systems'
+CREATE OR ALTER PROCEDURE SP_SQRT_DBMS_CREDITS
+AS
+BEGIN
+    SELECT CourseName, SQRT(CourseCredits) AS Credit_Sqrt
+    FROM COURSE
+    WHERE CourseName = 'Database Management Systems';
+END;
+EXEC SP_SQRT_DBMS_CREDITS;
+GO
+
+-- 10. Find the current date using SQL Server built-in function
+CREATE OR ALTER PROCEDURE SP_CURRENT_DATE
+AS
+BEGIN
+    SELECT GETDATE() AS CurrentDate;
+END;
+EXEC SP_CURRENT_DATE;
+GO
+
+-- 11. Find the top 3 students who enrolled earliest
+CREATE OR ALTER PROCEDURE SP_TOP3_EARLY_STUDENTS
+AS
+BEGIN
+    SELECT TOP 3 *
+    FROM STUDENT
+    ORDER BY StuEnrollmentYear;
+END;
+EXEC SP_TOP3_EARLY_STUDENTS;
+GO
+
+-- 12. Find all enrollments that were made in the year 2022
+CREATE OR ALTER PROCEDURE SP_ENROLLMENTS_2022
+AS
+BEGIN
+    SELECT *
+    FROM ENROLLMENT
+    WHERE YEAR(EnrollmentDate) = 2022;
+END;
+EXEC SP_ENROLLMENTS_2022;
+GO
+
+-- 13. Find the number of courses offered by each department
+CREATE OR ALTER PROCEDURE SP_COURSE_COUNT_BY_DEPT
+AS
+BEGIN
+    SELECT CourseDepartment, COUNT(*) AS TotalCourses
+    FROM COURSE
+    GROUP BY CourseDepartment;
+END;
+EXEC SP_COURSE_COUNT_BY_DEPT;
+GO
+
+-- 14. Retrieve the CourseID which has more than 2 enrollments
+CREATE OR ALTER PROCEDURE SP_COURSE_MORE_THAN_2_ENROLL
+AS
+BEGIN
+    SELECT CourseID
+    FROM ENROLLMENT
+    GROUP BY CourseID
+    HAVING COUNT(*) > 2;
+END;
+EXEC SP_COURSE_MORE_THAN_2_ENROLL;
+GO
+
+-- 15. Retrieve student names with their enrollment status
+CREATE OR ALTER PROCEDURE SP_STUDENT_ENROLL_STATUS
+AS
+BEGIN
+    SELECT S.StuName, E.EnrollmentStatus
+    FROM STUDENT S
+    JOIN ENROLLMENT E ON S.StudentID = E.StudentID;
+END;
+EXEC SP_STUDENT_ENROLL_STATUS;
+GO
+
+-- 16. Select student names with their enrolled course names
+CREATE OR ALTER PROCEDURE SP_STUDENT_COURSE_NAME
+AS
+BEGIN
+    SELECT S.StuName, C.CourseName
+    FROM STUDENT S
+    JOIN ENROLLMENT E ON S.StudentID = E.StudentID
+    JOIN COURSE C ON E.CourseID = C.CourseID;
+END;
+EXEC SP_STUDENT_COURSE_NAME;
+GO
+
+-- 17. Create a view called ActiveEnrollments showing only active enrollments
+CREATE OR ALTER VIEW ActiveEnrollments
+AS
+SELECT S.StuName, C.CourseName
+FROM STUDENT S
+JOIN ENROLLMENT E ON S.StudentID = E.StudentID
+JOIN COURSE C ON E.CourseID = C.CourseID
+WHERE E.EnrollmentStatus = 'Active';
+SELECT * FROM ActiveEnrollments;
+GO
+
+-- 18. Retrieve the student’s name who is not enrolled in any course
+CREATE OR ALTER PROCEDURE SP_STUDENT_NOT_ENROLLED
+AS
+BEGIN
+    SELECT StuName
+    FROM STUDENT
+    WHERE StudentID NOT IN (SELECT StudentID FROM ENROLLMENT);
+END;
+EXEC SP_STUDENT_NOT_ENROLLED;
+GO
+
+-- 19. Display course name having second highest credit
+CREATE OR ALTER PROCEDURE SP_SECOND_HIGHEST_CREDIT
+AS
+BEGIN
+    SELECT TOP 1 CourseName, CourseCredits
+    FROM COURSE
+    WHERE CourseCredits < (SELECT MAX(CourseCredits) FROM COURSE)
+    ORDER BY CourseCredits DESC;
+END;
+EXEC SP_SECOND_HIGHEST_CREDIT;
+GO
+
+
+-- =====================================================
+-- LAB–1 : SQL CONCEPTS
+-- PART – B
+-- =====================================================
+
+-- 20. Retrieve all courses along with the total number of students enrolled
+CREATE OR ALTER PROCEDURE SP_COURSE_TOTAL_ENROLL
+AS
+BEGIN
+    SELECT C.CourseName, COUNT(E.StudentID) AS TotalStudents
+    FROM COURSE C
+    LEFT JOIN ENROLLMENT E ON C.CourseID = E.CourseID
+    GROUP BY C.CourseName;
+END;
+EXEC SP_COURSE_TOTAL_ENROLL;
+GO
+
+-- 21. Retrieve the total number of enrollments for each status having more than 2 enrollments
+CREATE OR ALTER PROCEDURE SP_ENROLL_STATUS_COUNT
+AS
+BEGIN
+    SELECT EnrollmentStatus, COUNT(*) AS TotalEnrollments
+    FROM ENROLLMENT
+    GROUP BY EnrollmentStatus
+    HAVING COUNT(*) > 2;
+END;
+EXEC SP_ENROLL_STATUS_COUNT;
+GO
+
+-- 22. Retrieve all courses taught by 'Dr. Sheth' and order them by credits
+CREATE OR ALTER PROCEDURE SP_COURSE_BY_DR_SHETH
+AS
+BEGIN
+    SELECT C.CourseName, C.CourseCredits
+    FROM COURSE_ASSIGNMENT CA
+    JOIN COURSE C ON CA.CourseID = C.CourseID
+    JOIN FACULTY F ON CA.FacultyID = F.FacultyID
+    WHERE F.FacultyName = 'Dr. Sheth'
+    ORDER BY C.CourseCredits;
+END;
+EXEC SP_COURSE_BY_DR_SHETH;
+GO
+
+
+-- =====================================================
+-- LAB–1 : SQL CONCEPTS
+-- PART – C
+-- =====================================================
+
+-- 23. List all students who are enrolled in more than 3 courses
+CREATE OR ALTER PROCEDURE SP_STUDENT_MORE_THAN_3
+AS
+BEGIN
+    SELECT StudentID, COUNT(*) AS TotalCourses
+    FROM ENROLLMENT
+    GROUP BY StudentID
+    HAVING COUNT(*) > 3;
+END;
+EXEC SP_STUDENT_MORE_THAN_3;
+GO
+
+-- 24. Find students who have enrolled in both 'CS101' and 'CS201'
+CREATE OR ALTER PROCEDURE SP_STUDENT_CS101_CS201
+AS
+BEGIN
+    SELECT StudentID
+    FROM ENROLLMENT
+    WHERE CourseID IN ('CS101','CS201')
+    GROUP BY StudentID
+    HAVING COUNT(DISTINCT CourseID) = 2;
+END;
+EXEC SP_STUDENT_CS101_CS201;
+GO
+
+-- 25. Retrieve department-wise count of faculty members along with average years of experience
+CREATE OR ALTER PROCEDURE SP_FACULTY_EXP_BY_DEPT
+AS
+BEGIN
+    SELECT FacultyDepartment,
+           COUNT(*) AS TotalFaculty,
+           AVG(DATEDIFF(YEAR, FacultyJoiningDate, GETDATE())) AS AvgExperience
+    FROM FACULTY
+    GROUP BY FacultyDepartment;
+END;
+EXEC SP_FACULTY_EXP_BY_DEPT;
+GO
